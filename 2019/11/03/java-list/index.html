@@ -14,7 +14,7 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          java-list - null
+          java list - null
         
     </title>
 
@@ -107,7 +107,7 @@
                               <a class="tag" href="/tags/#Java" title="Java">Java</a>
                             
                         </div>
-                        <h1>java-list</h1>
+                        <h1>java list</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by hydra on
@@ -247,7 +247,19 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <p>java集合学习</p>
+                <p>#java集合学习，其一</p>
+<p>List是一种有序链表：List内部按照放入元素的先后顺序存放，并且每个元素都可以通过索引确定自己的位置。<br>List还提供了boolean contains(Object o)方法来判断List是否包含某个指定元素。此外，int indexOf(Object o)方法可以返回某个元素的索引，如果元素不存在，就返回-1。</p>
+<p>List内部并不是通过==判断两个元素是否相等，而是使用equals()方法判断两个元素是否相等。<br>因此，要正确使用List的contains()、indexOf()这些方法，放入的实例必须正确覆写equals()方法，否则，放进去的实例，查找不到。我们之所以能正常放入String、Integer这些对象，是因为Java标准库定义的这些类已经正确实现了equals()方法。</p>
+<p>简化引用类型的比较，我们使用Objects.equals()静态方法：<br>‘’’Java<br>public boolean equals(Object o) {<br>    if (o instanceof Person) {<br>        Person p = (Person) o;<br>        return Objects.equals(this.name, p.name) &amp;&amp; this.age == p.age;<br>    }<br>    return false;<br>}<br>‘’’</p>
+<p>因此，我们总结一下equals()方法的正确编写方法：</p>
+<ol>
+<li>先确定实例“相等”的逻辑，即哪些字段相等，就认为实例相等；</li>
+<li>用instanceof判断传入的待比较的Object是不是当前类型，如果是，继续比较，否则，返回false；</li>
+<li>对引用类型用Objects.equals()比较，对基本类型直接用==比较。</li>
+</ol>
+<p>使用Objects.equals()比较两个引用类型是否相等的目的是省去了判断null的麻烦。两个引用类型都是null时它们也是相等的。<br>如果不调用List的contains()、indexOf()这些方法，那么放入的元素就不需要实现equals()方法。</p>
+<p>###参考</p>
+<p><a href="https://www.liaoxuefeng.com/wiki/1252599548343744/1265118019954528" target="_blank" rel="noopener">廖雪峰Java教程</a></p>
 
                 
 
