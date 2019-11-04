@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          
+          Vertica 导入导出CSV文件 - null
         
     </title>
 
-    <link rel="canonical" href="https://dragonskyhydra.github.io/archives/2019/11/">
+    <link rel="canonical" href="https://dragonskyhydra.github.io/2019/11/04/vertica-copy/">
 
     <!-- Bootstrap Core CSS -->
 
@@ -101,13 +101,19 @@
 			
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1" style="z-index:2;">
                 
-				
-                    <div class="site-heading"  style="padding:40px">
-                        <h1>数据之道</h1>
-                        <!--<hr class="small">-->
-                        <span class="subheading">学习和研究</span>
+                    <div class="post-heading" style="padding:40px">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#Vertica" title="Vertica">Vertica</a>
+                            
+                        </div>
+                        <h1>Vertica 导入导出CSV文件</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by hydra on
+                            2019-11-04
+                        </span>
                     </div>
-                
                 
                 </div>
             </div>
@@ -228,241 +234,153 @@
 
 
     <!-- Main Content -->
-    <!-- Main Content -->
-<div class="container">
-    <div class="row">
-        
+    <!-- Modify by Yu-Hsuan Yen -->
 
-<!-- USE SIDEBAR -->
-    <!-- Post Container -->
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                post-container
-            ">
-            
-	        
-                
-<!-- Main Content -->
-<div class="container">
-    <div class="row">
-        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-            <!-- 归档列表 -->
-            
-            
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
 
-             <!-- 归档列表 -->
+                <h2 id="copy-数据导入工具"><a href="#copy-数据导入工具" class="headerlink" title="copy 数据导入工具"></a>copy 数据导入工具</h2><p>copy 命令无疑是最常用的导入工具了, 它是Vertica的bulk copy工具, 性能非常好. 可以直接从文本文件或者压缩文件导入数据,<br>支持的压缩格式有: BZIP | GZIP | LZO | UNCOMPRESSED<br>支持的文件格式有: csv | FIXEDWIDTH | json | ORC | parquet<br>设置为json 格式设置 parser.</p>
+<h3 id="从数据库-node-节点导入"><a href="#从数据库-node-节点导入" class="headerlink" title="从数据库 node 节点导入"></a>从数据库 node 节点导入</h3><p>从数据库节点的文件系统中导入数据, 需要有 vertica 的 superuser 的权限, 一般用比较少. 数据文件可以仅仅存放在某个节点上, 或者所有节点上. 比如在节点2上, 使用 on v_dbname_node0002 ; 在所有节点上, 使用 ON ANY NODE, 下面是一个示例</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">COPY schema.table </span><br><span class="line">    (column_a, column_b...)</span><br><span class="line">FROM '/tmp/bigdata.csv.gz' GZIP </span><br><span class="line">on v_dbname_node0002 </span><br><span class="line"><span class="keyword">WITH</span></span><br><span class="line">    DELIMITER <span class="keyword">AS</span> <span class="string">','</span></span><br><span class="line">    <span class="keyword">ENCLOSED</span> <span class="keyword">BY</span> <span class="string">'"'</span></span><br><span class="line">    <span class="keyword">SKIP</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
 
-            
-            <div class="one-tag-list">
-                <span class="fa fa-calendar-times-o listing-seperator" id="2019">
-                    <span class="tag-text">2019</span>
-                </span>
-                <ul>
+<h3 id="从客户端本地导入-copy-local"><a href="#从客户端本地导入-copy-local" class="headerlink" title="从客户端本地导入(copy local)"></a>从客户端本地导入(copy local)</h3><p>今天使用过，发现若是平面文件存在空行，会自动跳过，但若有对应列存在’NULL’值，这行也会不处理。<br>（工作时间，没细查，尚不知道是目标表该列定义为数值型的原因，还是因为只要是NULL就会导致问题。）</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">COPY schema.table </span><br><span class="line">    (column_a, column_b...)</span><br><span class="line">FROM LOCAL '/tmp/bigdata.csv.gz' GZIP</span><br><span class="line"><span class="keyword">WITH</span></span><br><span class="line">    DELIMITER <span class="keyword">AS</span> <span class="string">','</span></span><br><span class="line">    <span class="keyword">ENCLOSED</span> <span class="keyword">BY</span> <span class="string">'"'</span></span><br><span class="line">    <span class="keyword">SKIP</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="导出数据到本地文件"><a href="#导出数据到本地文件" class="headerlink" title="导出数据到本地文件"></a>导出数据到本地文件</h3><p>可以使用 vsql 命令行工具导出数据到本地文件, vsql 有非常强大的输出格式定制功能, 我们甚至可以使用 html 模版进行文件的导出.</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vsql -U username -w passwd -h testdb01 -d vmart "<span class="keyword">select</span> * <span class="keyword">from</span> export_query_result <span class="string">" -Aq -P footer=off -F ',' -o "</span>/tmp/example.csv<span class="string">"</span></span><br></pre></td></tr></table></figure>
+
+<p>export table 到另一个 vertica 集群中</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--首先执行连接目标集群</span></span><br><span class="line">CONNECT TO VERTICA my_database USER my_user PASSWORD 'my_password' ON '10.205.10.00',5433;</span><br><span class="line"><span class="comment">--执行数据 Export</span></span><br><span class="line">EXPORT TO VERTICA my_database.my_schema.my_table as</span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> my_schema.my_table <span class="keyword">where</span> my_date_column=<span class="built_in">date</span><span class="string">'2019-11-04'</span>;</span><br><span class="line"><span class="comment">---关闭连接</span></span><br><span class="line">DISCONNECT my_database;</span><br></pre></td></tr></table></figure>
+
+<h4 id="来源"><a href="#来源" class="headerlink" title="来源"></a>来源</h4><p><a href="https://www.cnblogs.com/harrychinese/p/vertica_data_import_export.html" target="_blank" rel="noopener">harrychinese 刘忠武</a></p>
+
                 
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    11-04
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/11/04/vertica-copy/" style="color: #0085a1">
-                        <span>
-                            Vertica 导入导出CSV文件
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    11-03
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/11/03/java-map/" style="color: #0085a1">
-                        <span>
-                            Java map
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    11-03
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/11/03/java-list/" style="color: #0085a1">
-                        <span>
-                            Java list
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    11-03
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/11/03/hello-world/" style="color: #0085a1">
-                        <span>
-                            Hello World
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2019/11/03/java-map/" data-toggle="tooltip" data-placement="top" title="Java map">Next post &rarr;</a>
+                        </li>
+                    
                 </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                    <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                    <!--  css & js -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!--分享-->
+                <br>                       
+                
+                <!-- require APlayer -->
+                
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+				
             </div>
-            
 
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
 
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">Tags</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#Vertica" title="Vertica">Vertica</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://github.com/dragonskyhydra" target="_blank">MyGithub</a></li>
+                    
+                </ul>
+                
+            </div>
         </div>
     </div>
-</div>
-            
+</article>
 
 
 
-                <!-- 如果开启评论功能 -->
-                
-            </div>
-
-          <!-- Sidebar Container -->
-<div class="
-    col-lg-3 col-lg-offset-0
-    col-md-3 col-md-offset-0
-    col-sm-12
-    col-xs-12
-    sidebar-container
-">
-    
-        <!-- Featured Tags -->
-
-<section>
-    <!-- no hr -->
-    <h5><a href="/tags/">Tags</a></h5>
-    <div class="tags">
-        
-            
-            <a href="/tags/#Java" title="Java" rel="2">Java</a>
-            
-        
-            
-            <a href="/tags/#Vertica" title="Vertica" rel="1">Vertica</a>
-            
-        
-    </div>
-</section>
-
-        <hr>
-    
-        <!-- Short About -->
-<section class="visible-md visible-lg">
-    <!--<h5><a href="/about/">About me</a></h5>-->
-    <h5><a href="https://github.com/dragonskyhydra" target="_blank" rel="noopener">About me</a></h5>
-    <div class="short-about">
-
-        
-            <img id = "avatar_pic" src="/img/avatar/timg.jpg" />
-        
-
-        
-            <p>请多指教</p>
-        
-
-        <!-- SNS Link -->
-        <ul class="list-inline">
-            
-            
-            
-
-            
-
-            
-
-            
-                <li>
-                    <a target="_blank"  href="https://github.com/dragonskyhydra">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </a>
-                </li>
-            
-            
-            
-            
-        </ul>
-    </div>
-</section>
-
-        <hr>
-    
-        
-  <h5>Recent posts</h3>
-  <div class="widget">
-    <ul>
-      
-        <li>
-          <a href="/2019/11/04/vertica-copy/">Vertica 导入导出CSV文件</a>
-        </li>
-      
-        <li>
-          <a href="/2019/11/03/java-map/">Java map</a>
-        </li>
-      
-        <li>
-          <a href="/2019/11/03/java-list/">Java list</a>
-        </li>
-      
-        <li>
-          <a href="/2019/11/03/hello-world/">Hello World</a>
-        </li>
-      
-    </ul>
-  </div>
-
-        <hr>
-    
-        
-    <h5>Achives</h5>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">4</span></li></ul>
-    </div>
-
-        <hr>
-    
-        <!-- Friends Blog -->
-
-<h5>Friends</h5>
-<ul class="list-inline">
-
-    
-        <li><a href="https://github.com/dragonskyhydra" target="_blank">MyGithub</a></li>
-    
-</ul>
 
 
-        <hr>
-    
-</div>
 
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
 
-        
-    </div>
-</div>
 
 
     <!-- Footer -->
@@ -567,7 +485,7 @@
 <script>
     // only load tagcloud.js in tag.html
     if($('#tag_cloud').length !== 0){
-        async("https://dragonskyhydra.github.io/archives/2019/11/index.html/js/jquery.tagcloud.js",function(){
+        async("https://dragonskyhydra.github.io/2019/11/04/vertica-copy/index.html/js/jquery.tagcloud.js",function(){
             $.fn.tagcloud.defaults = {
                 //size: {start: 1, end: 1, unit: 'em'},
                 color: {start: '#bbbbee', end: '#0085a1'},
