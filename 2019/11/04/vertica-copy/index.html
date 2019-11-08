@@ -251,7 +251,7 @@
 <h3 id="从数据库-node-节点导入"><a href="#从数据库-node-节点导入" class="headerlink" title="从数据库 node 节点导入"></a>从数据库 node 节点导入</h3><p>从数据库节点的文件系统中导入数据, 需要有 vertica 的 superuser 的权限, 一般用比较少. 数据文件可以仅仅存放在某个节点上, 或者所有节点上. 比如在节点2上, 使用 on v_dbname_node0002 ; 在所有节点上, 使用 ON ANY NODE, 下面是一个示例</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">COPY schema.table </span><br><span class="line">    (column_a, column_b...)</span><br><span class="line">FROM '/tmp/bigdata.csv.gz' GZIP </span><br><span class="line">on v_dbname_node0002 </span><br><span class="line"><span class="keyword">WITH</span></span><br><span class="line">    DELIMITER <span class="keyword">AS</span> <span class="string">','</span></span><br><span class="line">    <span class="keyword">ENCLOSED</span> <span class="keyword">BY</span> <span class="string">'"'</span></span><br><span class="line">    <span class="keyword">SKIP</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
 
-<h3 id="从客户端本地导入-copy-local"><a href="#从客户端本地导入-copy-local" class="headerlink" title="从客户端本地导入(copy local)"></a>从客户端本地导入(copy local)</h3><p>今天使用过，发现若是平面文件存在空行，会自动跳过，但若有对应列存在’NULL’值，这行也会不处理。<br>（工作时间，没细查，尚不知道是目标表该列定义为数值型的原因，还是因为只要是NULL就会导致问题。）</p>
+<h3 id="从客户端本地导入-copy-local"><a href="#从客户端本地导入-copy-local" class="headerlink" title="从客户端本地导入(copy local)"></a>从客户端本地导入(copy local)</h3><p>今天使用过，发现若是平面文件存在空行，会自动跳过，但若有对应列存在’NULL’值，这行也会不处理。<br>（工作时间，没细查，尚不知道是目标表该列定义为数值型的原因，还是因为只要是NULL就会导致问题。）<br>100多列，3万行，大概1-2秒就能完成。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">COPY schema.table </span><br><span class="line">    (column_a, column_b...)</span><br><span class="line">FROM LOCAL '/tmp/bigdata.csv.gz' GZIP</span><br><span class="line"><span class="keyword">WITH</span></span><br><span class="line">    DELIMITER <span class="keyword">AS</span> <span class="string">','</span></span><br><span class="line">    <span class="keyword">ENCLOSED</span> <span class="keyword">BY</span> <span class="string">'"'</span></span><br><span class="line">    <span class="keyword">SKIP</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
 
 <h3 id="导出数据到本地文件"><a href="#导出数据到本地文件" class="headerlink" title="导出数据到本地文件"></a>导出数据到本地文件</h3><p>可以使用 vsql 命令行工具导出数据到本地文件, vsql 有非常强大的输出格式定制功能, 我们甚至可以使用 html 模版进行文件的导出.</p>
@@ -267,6 +267,10 @@
                 <hr>
                 <!-- Pager -->
                 <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2019/11/08/hive-row2col/" data-toggle="tooltip" data-placement="top" title="Hive分组行转列实现">&larr; Previous post</a>
+                        </li>
                     
                     
                         <li class="next">

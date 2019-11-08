@@ -250,6 +250,66 @@
 
 
 <div class="w3-row-padding">
+	<a href="/2019/11/08/hive-row2col/">
+        <h2 class="post-title">
+            Hive分组行转列实现
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+	</a>
+
+<div>
+
+    <a href="/2019/11/08/hive-row2col/">
+
+        <div class="post-content-preview">
+            Hive行转列今天遇到一个业务需求，要将Hive里一个维表实现分组行转列，例，table_sample如下
+
+
+
+cd_var
+cd_var_nm
+
+
+
+A班-01
+小若
+
+
+A班-02
+小红
+
+
+B班-01
+小离
+
+
+B班-02
+小敏
+
+
+B班-03
+小昭
+
+
+实现按班级分组行转列：
+123456SELECT cdv,cdn[0] AS C1,cdn[1] AS C2,cdn[2] .........
+        </div>
+    </a>
+    
+        <p class="post-meta">
+            Posted by hydra on
+            2019-11-08
+        </p>
+    
+
+</div>
+</div>
+<hr>
+
+
+<div class="w3-row-padding">
 	<a href="/2019/11/04/vertica-copy/">
         <h2 class="post-title">
             Vertica 导入导出CSV文件
@@ -406,6 +466,14 @@ List内部并不是通过==判断两个元素.........
     <div class="tags">
         
             
+            <a href="/tags/#Hadoop" title="Hadoop" rel="1">Hadoop</a>
+            
+        
+            
+            <a href="/tags/#ETL" title="ETL" rel="1">ETL</a>
+            
+        
+            
             <a href="/tags/#Java" title="Java" rel="2">Java</a>
             
         
@@ -429,7 +497,7 @@ List内部并不是通过==判断两个元素.........
         
 
         
-            <p>请多指教</p>
+            <p>1620189485@qq.com</p>
         
 
         <!-- SNS Link -->
@@ -467,6 +535,10 @@ List内部并不是通过==判断两个元素.........
     <ul>
       
         <li>
+          <a href="/2019/11/08/hive-row2col/">Hive分组行转列实现</a>
+        </li>
+      
+        <li>
           <a href="/2019/11/04/vertica-copy/">Vertica 导入导出CSV文件</a>
         </li>
       
@@ -490,7 +562,7 @@ List内部并不是通过==判断两个元素.........
         
     <h5>Achives</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">4</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">5</span></li></ul>
     </div>
 
         <hr>
