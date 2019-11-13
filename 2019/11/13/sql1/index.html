@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          Hive分组行转列实现 - null
+          关于数据统计中的年累计运算 - null
         
     </title>
 
-    <link rel="canonical" href="https://dragonskyhydra.github.io/2019/11/08/hive-row2col/">
+    <link rel="canonical" href="https://dragonskyhydra.github.io/2019/11/13/sql1/">
 
     <!-- Bootstrap Core CSS -->
 
@@ -104,16 +104,16 @@
                     <div class="post-heading" style="padding:40px">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#Hadoop" title="Hadoop">Hadoop</a>
-                            
                               <a class="tag" href="/tags/#ETL" title="ETL">ETL</a>
                             
+                              <a class="tag" href="/tags/#Hive" title="Hive">Hive</a>
+                            
                         </div>
-                        <h1>Hive分组行转列实现</h1>
+                        <h1>关于数据统计中的年累计运算</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by hydra on
-                            2019-11-08
+                            2019-11-13
                         </span>
                     </div>
                 
@@ -249,61 +249,16 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h2 id="Hive行转列"><a href="#Hive行转列" class="headerlink" title="Hive行转列"></a>Hive行转列</h2><p>今天遇到一个业务需求，要将Hive里一个维表实现分组行转列，例，table_sample如下</p>
-<table>
-<thead>
-<tr>
-<th align="center">cd_var</th>
-<th align="center">cd_var_nm</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">A班-01</td>
-<td align="center">小若</td>
-</tr>
-<tr>
-<td align="center">A班-02</td>
-<td align="center">小红</td>
-</tr>
-<tr>
-<td align="center">B班-01</td>
-<td align="center">小离</td>
-</tr>
-<tr>
-<td align="center">B班-02</td>
-<td align="center">小敏</td>
-</tr>
-<tr>
-<td align="center">B班-03</td>
-<td align="center">小昭</td>
-</tr>
-</tbody></table>
-<p>实现按班级分组行转列：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> cdv,cdn[<span class="number">0</span>] <span class="keyword">AS</span> C1,cdn[<span class="number">1</span>] <span class="keyword">AS</span> C2,cdn[<span class="number">2</span>] <span class="keyword">AS</span> C3</span><br><span class="line"><span class="keyword">FROM</span>(</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="keyword">substr</span>(cd_var,<span class="number">0</span>,<span class="number">2</span>) <span class="keyword">AS</span> cdv,<span class="keyword">split</span>(<span class="keyword">concat_ws</span>(<span class="string">','</span>,collect_set(<span class="keyword">column</span>)),<span class="string">','</span>) <span class="keyword">AS</span> cdn</span><br><span class="line">    <span class="keyword">FROM</span> table_sample</span><br><span class="line">    <span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">substr</span>(cd_var,<span class="number">0</span>,<span class="number">2</span>)</span><br><span class="line">)T</span><br></pre></td></tr></table></figure>
-<p>输出结果如下</p>
-<table>
-<thead>
-<tr>
-<th align="center">cdv</th>
-<th align="center">C1</th>
-<th align="center">C2</th>
-<th align="center">C3</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">A班</td>
-<td align="center">小若</td>
-<td align="center">小红</td>
-<td align="center">NULL</td>
-</tr>
-<tr>
-<td align="center">B班</td>
-<td align="center">小离</td>
-<td align="center">小敏</td>
-<td align="center">小昭</td>
-</tr>
-</tbody></table>
-<p>注：<br>split返回是一个<kbd>数组[]</kbd>，可以直接按下标取值，实现多列。<br>这个方法比较简单粗暴，业务需求中ETL需要快速处理完成，不够炫酷，但简单够用。</p>
+                <h2 id="开窗函数实现"><a href="#开窗函数实现" class="headerlink" title="开窗函数实现"></a>开窗函数实现</h2><p>数仓里有ads层，是需要我们建模后，从dwd层抽取需要的数据，组建应用宽表，以供后续使用。<br>以下简化说明。</p>
+<p>有资金事实表ads.ads_fact_fund_d，<br>列city（城市），资金（happen_amt），交易日期（deal_dt）</p>
+<p>需求：<br>    输出宽表格式，按城市，按月，统计每月资金量，以及从年初到该月的年累计资金量。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> a <span class="keyword">as</span> (</span><br><span class="line">	<span class="keyword">select</span> city,</span><br><span class="line">	       <span class="keyword">SUM</span>(happen_amt) <span class="keyword">as</span> current_period_val,</span><br><span class="line">           trunc(deal_dt,<span class="string">'MM'</span>) <span class="keyword">AS</span> data_dt</span><br><span class="line">	<span class="keyword">from</span> ads.ads_fact_fund d </span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span> city,trunc(deal_dt,<span class="string">'MM'</span>)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> city,data_dt,current_period_val,</span><br><span class="line">	   <span class="keyword">sum</span>(current_period_val) <span class="keyword">OVER</span> (<span class="keyword">PARTITION</span> <span class="keyword">BY</span> city <span class="keyword">ORDER</span> <span class="keyword">BY</span> data_dt <span class="keyword">ASC</span>) <span class="keyword">AS</span> year_tol</span><br><span class="line"><span class="keyword">from</span> a</span><br><span class="line"><span class="keyword">where</span> <span class="keyword">year</span>(data_dt)=<span class="number">2019</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> city,data_dt</span><br></pre></td></tr></table></figure>
+
+<p>利用开窗函数可以轻松实现 <kbd>城市-月-月资金-当月年累计资金</kbd> 的宽表格式。<br>可以思考一下，进一步实现加上 <kbd>上期值-去年同期资金-去年同期年累计资金</kbd> 之后的需求。</p>
+<h2 id="ETL过程实现增量更新"><a href="#ETL过程实现增量更新" class="headerlink" title="ETL过程实现增量更新"></a>ETL过程实现增量更新</h2><p>在我们快速开发时，利用SQL将大量历史数据初始化进入宽表后，再接下来就要开发每月数据增量更新的ETL程序，我们暂时使用的工具是infomatica公司的BDM。这是将用来代替PowerCenter的新一代工具，支持大数据平台如Hive等与传统关系型数据库进行交互，能够在不同数据源及数据平台上开发ETL流程，开发完成后的ETL流程可以推送给spark引擎执行，功能强大。</p>
+<p>现在BDM网上资料不多，很多材料也靠公司同事翻译，暂时用起来还比较跌跌撞撞，具体ETL流程不详述了，将实现逻辑用SQL表达：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> overwrite <span class="keyword">table</span> ads.ads_value_tol</span><br><span class="line"><span class="keyword">PARTITION</span>(data_dt)</span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">city,data_dt,current_period_val,year_tol,<span class="keyword">sysdate</span> <span class="keyword">AS</span> etl_tm</span><br><span class="line"><span class="keyword">FROM</span> (</span><br><span class="line">	<span class="keyword">select</span> city,</span><br><span class="line">	<span class="keyword">sum</span>(<span class="keyword">case</span> <span class="keyword">when</span> trunc(deal_dt,<span class="string">'MM'</span>)=trunc(<span class="keyword">sysdate</span>,<span class="string">'MM'</span>) <span class="keyword">then</span> happen_amt <span class="keyword">ELSE</span> <span class="number">0</span> <span class="keyword">END</span>) <span class="keyword">as</span> current_period_val, <span class="comment">--当期值</span></span><br><span class="line">	<span class="keyword">SUM</span>(<span class="keyword">case</span> <span class="keyword">when</span> trunc(deal_dt,<span class="string">'MM'</span>)=trunc(add_months(<span class="keyword">sysdate</span>,<span class="number">-1</span>),<span class="string">'MM'</span>) <span class="keyword">THEN</span> happen_amt <span class="keyword">ELSE</span> <span class="number">0</span> <span class="keyword">END</span>) <span class="keyword">AS</span> last_period_val, <span class="comment">--上期值</span></span><br><span class="line">	<span class="keyword">sum</span>(<span class="keyword">case</span> <span class="keyword">when</span> trunc(deal_dt,<span class="string">'MM'</span>)=trunc(add_months(<span class="keyword">sysdate</span>,<span class="number">-12</span>),<span class="string">'MM'</span>) <span class="keyword">THEN</span> happen_amt <span class="keyword">ELSE</span> <span class="number">0</span> <span class="keyword">END</span>) <span class="keyword">AS</span> period_of_time_val, <span class="comment">--去年同期值</span></span><br><span class="line">	<span class="keyword">sum</span>(<span class="keyword">case</span> <span class="keyword">when</span> trunc(deal_dt,<span class="string">'YEAR'</span>)=trunc(<span class="keyword">sysdate</span>,<span class="string">'YEAR'</span>) <span class="keyword">AND</span> trunc(deal_dt,<span class="string">'MM'</span>)&lt;<span class="keyword">date_add</span>(trunc(<span class="keyword">sysdate</span>,<span class="string">'MM'</span>),<span class="number">1</span>) <span class="keyword">THEN</span> happen_amt <span class="keyword">ELSE</span> <span class="number">0</span> <span class="keyword">END</span>) <span class="keyword">AS</span> year_tol, <span class="comment">--年累计</span></span><br><span class="line">	<span class="keyword">sum</span>(<span class="keyword">case</span> <span class="keyword">when</span> trunc(deal_dt,<span class="string">'YEAR'</span>)=trunc(add_months(<span class="keyword">sysdate</span>,<span class="number">-12</span>),<span class="string">'YEAR'</span>) <span class="keyword">AND</span> trunc(deal_dt,<span class="string">'MM'</span>)&lt;<span class="keyword">date_add</span>(trunc(add_months(<span class="keyword">sysdate</span>,<span class="number">-12</span>),<span class="string">'MM'</span>),<span class="number">1</span>) <span class="keyword">THEN</span> happen_amt <span class="keyword">ELSE</span> <span class="number">0</span> <span class="keyword">END</span>) <span class="keyword">AS</span> last_year_tol, <span class="comment">--去年同期年累计</span></span><br><span class="line">	trunc(<span class="keyword">sysdate</span>,<span class="string">'MM'</span>) <span class="keyword">AS</span> data_dt</span><br><span class="line">	<span class="keyword">from</span> ads.ads_fund_inout d </span><br><span class="line">	<span class="keyword">group</span> <span class="keyword">by</span> city</span><br><span class="line">)t</span><br></pre></td></tr></table></figure>
+
 
                 
 
@@ -311,13 +266,9 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/2019/11/13/sql1/" data-toggle="tooltip" data-placement="top" title="关于数据统计中的年累计运算">&larr; Previous post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/2019/11/04/vertica-copy/" data-toggle="tooltip" data-placement="top" title="Vertica 导入导出CSV文件">Next post &rarr;</a>
+                            <a href="/2019/11/08/hive-row2col/" data-toggle="tooltip" data-placement="top" title="Hive分组行转列实现">Next post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -367,9 +318,9 @@
                     <h5><a href="/tags/">Tags</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#Hadoop" title="Hadoop">Hadoop</a>
-                        
                           <a class="tag" href="/tags/#ETL" title="ETL">ETL</a>
+                        
+                          <a class="tag" href="/tags/#Hive" title="Hive">Hive</a>
                         
                     </div>
                 </section>
@@ -534,7 +485,7 @@
 <script>
     // only load tagcloud.js in tag.html
     if($('#tag_cloud').length !== 0){
-        async("https://dragonskyhydra.github.io/2019/11/08/hive-row2col/index.html/js/jquery.tagcloud.js",function(){
+        async("https://dragonskyhydra.github.io/2019/11/13/sql1/index.html/js/jquery.tagcloud.js",function(){
             $.fn.tagcloud.defaults = {
                 //size: {start: 1, end: 1, unit: 'em'},
                 color: {start: '#bbbbee', end: '#0085a1'},
