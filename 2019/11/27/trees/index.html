@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          
+          LSM-tree和B-tree笔记 - null
         
     </title>
 
-    <link rel="canonical" href="https://dragonskyhydra.github.io/tags/Hive/">
+    <link rel="canonical" href="https://dragonskyhydra.github.io/2019/11/27/trees/">
 
     <!-- Bootstrap Core CSS -->
 
@@ -101,13 +101,21 @@
 			
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1" style="z-index:2;">
                 
-				
-                    <div class="site-heading"  style="padding:40px">
-                        <h1>数据之道</h1>
-                        <!--<hr class="small">-->
-                        <span class="subheading">学习和研究</span>
+                    <div class="post-heading" style="padding:40px">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#RDBMS" title="RDBMS">RDBMS</a>
+                            
+                              <a class="tag" href="/tags/#NoSQL" title="NoSQL">NoSQL</a>
+                            
+                        </div>
+                        <h1>LSM-tree和B-tree笔记</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by hydra on
+                            2019-11-27
+                        </span>
                     </div>
-                
                 
                 </div>
             </div>
@@ -228,310 +236,149 @@
 
 
     <!-- Main Content -->
-    <!-- Main Content -->
-<div class="container">
-    <div class="row">
-        
+    <!-- Modify by Yu-Hsuan Yen -->
 
-<!-- USE SIDEBAR -->
-    <!-- Post Container -->
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                post-container
-            ">
-            
-	        
-                
-<!-- Main Content -->
-<div class="container">
-    <div class="row">
-        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-            <!-- 归档列表 -->
-            
-            
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
 
-             <!-- 归档列表 -->
+                <h2 id="数据库核心：数据结构"><a href="#数据库核心：数据结构" class="headerlink" title="数据库核心：数据结构"></a>数据库核心：数据结构</h2><p>现在大家熟悉的两种数据库~传统关系型数据库与NoSQL数据库，对应着两个存储引擎家族，即日志结构的存储引擎和面向页的存储引擎，两种数据结构典型实现如LSM-tree 和 B-Tree。</p>
+<h3 id="LSM-tree和B-tree的优劣点"><a href="#LSM-tree和B-tree的优劣点" class="headerlink" title="LSM-tree和B-tree的优劣点"></a>LSM-tree和B-tree的优劣点</h3><h4 id="LSM-tree"><a href="#LSM-tree" class="headerlink" title="LSM-tree"></a>LSM-tree</h4><p>LSM-Tree，Log-Structured Merge-Tree，日志结构的合并树。<br>根据经验，LSM-tree通常对于写入更快。当写入时，会先添加到有序的内存表（树），内存表大于某个阈值时，再刷到磁盘。后台进程周期性地执行段合并和压缩过程，以合并多个段文件，并丢弃那些已被覆盖或删除的值。<br>LSM-tree仅追加更新文件，并删除过时文件，不会修改文件。LSM-tree以顺序方式写入紧凑的SSTable文件，不像B树原位置更新覆盖旧页、甚至可能需要重写树中的多个页。追加和分段合并主要是顺序写，顺序写的性能对比随机写不须多说。</p>
+<p>LSM-tree可以支持更好的压缩，B-tree会使某些磁盘空间无法使用：当页分裂或当一行的内容不能适合现有页时，页中的某些空间无法使用。由于LSM-tree不是面向页的，并且会定期重写SSTable以消除碎片化，所有它们具有较低的存储开销，特别是使用分层压缩时。</p>
+<h4 id="B-tree"><a href="#B-tree" class="headerlink" title="B-tree"></a>B-tree</h4><p>B树被认为读取更快，像SSTable一样，B-tree保留了按键排序，这样可以实现高效的键值查找和区间查找。但相似仅此而已，B树本质上具有非常不同的设计理念。<br>日志结构索引将数据库分解为可变大小的段，通常大小为几兆字节或更大，并且始终按顺序写入段。相比之下，B树将数据库分解为固定大小的块或页，传统上大小为4KB（有时更大），页是内部读/写的最小单元。这种设计更接近底层硬件，因为磁盘也是固定大小的块排列。</p>
+<p>每个页面都可以使用地址或位置进行标识，这样可以让一个页面引用另一个页面，类似指针，不过是指向磁盘地址，而不是内存。<br>某一页被指定为B-树的根；每当查找索引中的一个键时，总是从这里开始。该页面会包含若干个键和对子页的引用。<br>具有n个键的B-tree总是具有O(log n)的深度。大多数数据库可以适合3-4层的B-tree，因此不需要遍历非常深的页面层次即可找到所需的页。</p>
+<p>LSM-tree的压缩过程有时会干扰正在进行的读写操作，而B-tree的响应延迟则更具有确定性。</p>
+<p>B-tree每个键都恰好唯一对应于索引中的某个位置，而日志结构的存储引擎可能在不同的段中具有相同键的多个副本。如果数据库希望提供强大的事务语义，B-tree显得更有优势：在许多关系型数据库中，事务隔离是通过键范围上的锁来实现的，在B-tree索引中，这些锁可以直接定义到树中。</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>《数据密集型应用系统设计》 中国电力出版社</p>
 
-            
-            <div class="one-tag-list">
-                <span class="fa fa-calendar-times-o listing-seperator" id="2019">
-                    <span class="tag-text">2019</span>
-                </span>
-                <ul>
                 
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    11-27
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/11/27/trees/" style="color: #0085a1">
-                        <span>
-                            LSM-tree和B-tree笔记
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    11-13
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/11/13/sql1/" style="color: #0085a1">
-                        <span>
-                            关于数据统计中的年累计运算
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    11-08
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/11/08/hive-row2col/" style="color: #0085a1">
-                        <span>
-                            Hive分组行转列实现
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    11-04
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/11/04/vertica-copy/" style="color: #0085a1">
-                        <span>
-                            Vertica 导入导出CSV文件
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    11-03
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/11/03/java-map/" style="color: #0085a1">
-                        <span>
-                            Java map
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    11-03
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/11/03/java-list/" style="color: #0085a1">
-                        <span>
-                            Java list
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
-                  <!-- <li class="listing-item">
-                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-                  </li> -->
-                 <li >
-                    11-03
-                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    <a href="/2019/11/03/hello-world/" style="color: #0085a1">
-                        <span>
-                            Hello World
-                        </span>
-                    </a>
-                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-                </li>
-                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/2019/11/13/sql1/" data-toggle="tooltip" data-placement="top" title="关于数据统计中的年累计运算">Next post &rarr;</a>
+                        </li>
+                    
                 </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                    <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
+                    <!--  css & js -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
+                
+                <!--分享-->
+                <br>                       
+                
+                <!-- require APlayer -->
+                
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+				
             </div>
-            
 
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
 
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">Tags</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#RDBMS" title="RDBMS">RDBMS</a>
+                        
+                          <a class="tag" href="/tags/#NoSQL" title="NoSQL">NoSQL</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://github.com/dragonskyhydra" target="_blank">MyGithub</a></li>
+                    
+                </ul>
+                
+            </div>
         </div>
     </div>
-</div>
-            
+</article>
 
 
 
-                <!-- 如果开启评论功能 -->
-                
-            </div>
-
-          <!-- Sidebar Container -->
-<div class="
-    col-lg-3 col-lg-offset-0
-    col-md-3 col-md-offset-0
-    col-sm-12
-    col-xs-12
-    sidebar-container
-">
-    
-        <!-- Featured Tags -->
-
-<section>
-    <!-- no hr -->
-    <h5><a href="/tags/">Tags</a></h5>
-    <div class="tags">
-        
-            
-            <a href="/tags/#Java" title="Java" rel="2">Java</a>
-            
-        
-            
-            <a href="/tags/#Hadoop" title="Hadoop" rel="1">Hadoop</a>
-            
-        
-            
-            <a href="/tags/#ETL" title="ETL" rel="2">ETL</a>
-            
-        
-            
-            <a href="/tags/#Hive" title="Hive" rel="1">Hive</a>
-            
-        
-            
-            <a href="/tags/#RDBMS" title="RDBMS" rel="1">RDBMS</a>
-            
-        
-            
-            <a href="/tags/#NoSQL" title="NoSQL" rel="1">NoSQL</a>
-            
-        
-            
-            <a href="/tags/#Vertica" title="Vertica" rel="1">Vertica</a>
-            
-        
-    </div>
-</section>
-
-        <hr>
-    
-        <!-- Short About -->
-<section class="visible-md visible-lg">
-    <!--<h5><a href="/about/">About me</a></h5>-->
-    <h5><a href="https://github.com/dragonskyhydra" target="_blank" rel="noopener">About me</a></h5>
-    <div class="short-about">
-
-        
-            <img id = "avatar_pic" src="/img/avatar/timg.jpg" />
-        
-
-        
-            <p>1620189485@qq.com</p>
-        
-
-        <!-- SNS Link -->
-        <ul class="list-inline">
-            
-            
-            
-
-            
-
-            
-
-            
-                <li>
-                    <a target="_blank"  href="https://github.com/dragonskyhydra">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </a>
-                </li>
-            
-            
-            
-            
-        </ul>
-    </div>
-</section>
-
-        <hr>
-    
-        
-  <h5>Recent posts</h3>
-  <div class="widget">
-    <ul>
-      
-        <li>
-          <a href="/2019/11/27/trees/">LSM-tree和B-tree笔记</a>
-        </li>
-      
-        <li>
-          <a href="/2019/11/13/sql1/">关于数据统计中的年累计运算</a>
-        </li>
-      
-        <li>
-          <a href="/2019/11/08/hive-row2col/">Hive分组行转列实现</a>
-        </li>
-      
-        <li>
-          <a href="/2019/11/04/vertica-copy/">Vertica 导入导出CSV文件</a>
-        </li>
-      
-        <li>
-          <a href="/2019/11/03/java-map/">Java map</a>
-        </li>
-      
-    </ul>
-  </div>
-
-        <hr>
-    
-        
-    <h5>Achives</h5>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">7</span></li></ul>
-    </div>
-
-        <hr>
-    
-        <!-- Friends Blog -->
-
-<h5>Friends</h5>
-<ul class="list-inline">
-
-    
-        <li><a href="https://github.com/dragonskyhydra" target="_blank">MyGithub</a></li>
-    
-</ul>
 
 
-        <hr>
-    
-</div>
 
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
 
-        
-    </div>
-</div>
 
 
     <!-- Footer -->
@@ -636,7 +483,7 @@
 <script>
     // only load tagcloud.js in tag.html
     if($('#tag_cloud').length !== 0){
-        async("https://dragonskyhydra.github.io/tags/Hive/index.html/js/jquery.tagcloud.js",function(){
+        async("https://dragonskyhydra.github.io/2019/11/27/trees/index.html/js/jquery.tagcloud.js",function(){
             $.fn.tagcloud.defaults = {
                 //size: {start: 1, end: 1, unit: 'em'},
                 color: {start: '#bbbbee', end: '#0085a1'},
