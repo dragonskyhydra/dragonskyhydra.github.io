@@ -250,6 +250,103 @@
 
 
 <div class="w3-row-padding">
+	<a href="/2019/12/22/hive-notes2/">
+        <h2 class="post-title">
+            Hive-笔记（3）
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+	</a>
+
+<div>
+
+    <a href="/2019/12/22/hive-notes2/">
+
+        <div class="post-content-preview">
+            Hive正则表达式数据抽取笔记最近在处理一批数据时，原始数据很乱，没有规范化，需要进行按一定格式抽取，这必然就是正则的舞台了。
+源内容：湖南.怀化地区虚拟站/燃煤/总有功/日电量＠日电量筱溪/当日/电量湖南.沙田/日电量湖南.凤滩A2厂/当日/电量省网发电火电计划值500kV网损率全省网损率祁韶直流实际电量＠日电量葛洲坝计划值湖南.常德地区虚拟站/打包.当日/电量
+提取内容：怀化地区虚.........
+        </div>
+    </a>
+    
+        <p class="post-meta">
+            Posted by hydra on
+            2019-12-22
+        </p>
+    
+
+</div>
+</div>
+<hr>
+
+
+<div class="w3-row-padding">
+	<a href="/2019/12/22/hive-notes1/">
+        <h2 class="post-title">
+            Hive-笔记（2）
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+	</a>
+
+<div>
+
+    <a href="/2019/12/22/hive-notes1/">
+
+        <div class="post-content-preview">
+            Hive分组，列值拼成字符串这个之前其实已经提到过了，这次写文档遇到个需求，再巩固一下写法。
+
+
+
+cd_var
+cd_var_nm
+
+
+
+岳阳市
+岳阳县
+
+
+岳阳市
+平江县
+
+
+岳阳市
+湘阴县
+
+
+岳阳市
+华容县
+
+
+省份、地市、区县加起来太多，写文档的时候，直接按着以上格式排列的话，太占地方了，需要处理如下
+
+
+
+cd_var
+cd_var_nm
+
+
+
+岳阳市
+岳阳县,平江县,湘阴.........
+        </div>
+    </a>
+    
+        <p class="post-meta">
+            Posted by hydra on
+            2019-12-22
+        </p>
+    
+
+</div>
+</div>
+<hr>
+
+
+<div class="w3-row-padding">
 	<a href="/2019/11/27/trees/">
         <h2 class="post-title">
             LSM-tree和B-tree笔记
@@ -272,6 +369,37 @@ LSM-tree和B-tree的优劣点LSM-treeLSM-Tree，Log-Structured Merge-Tree，日�
         <p class="post-meta">
             Posted by hydra on
             2019-11-27
+        </p>
+    
+
+</div>
+</div>
+<hr>
+
+
+<div class="w3-row-padding">
+	<a href="/2019/11/24/vertica-about-with/">
+        <h2 class="post-title">
+            Vertica的with语句问题
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+	</a>
+
+<div>
+
+    <a href="/2019/11/24/vertica-about-with/">
+
+        <div class="post-content-preview">
+            关于Vertica使用CTE表达式所遇到的问题之一今天在工作中遇到一个玄学问题，是关于Vertica使用with语句的问题，语句如下：
+123456789101112with a as (    select t1.c1, t1.c2,t2.c3 from table1 t1    join table2 t2 on t1.c3=t2.c3),b as (select * from t.........
+        </div>
+    </a>
+    
+        <p class="post-meta">
+            Posted by hydra on
+            2019-11-24
         </p>
     
 
@@ -530,19 +658,19 @@ List内部并不是通过==判断两个元素.........
     <div class="tags">
         
             
+            <a href="/tags/#Hadoop" title="Hadoop" rel="3">Hadoop</a>
+            
+        
+            
+            <a href="/tags/#ETL" title="ETL" rel="4">ETL</a>
+            
+        
+            
+            <a href="/tags/#Hive" title="Hive" rel="2">Hive</a>
+            
+        
+            
             <a href="/tags/#Java" title="Java" rel="2">Java</a>
-            
-        
-            
-            <a href="/tags/#Hadoop" title="Hadoop" rel="1">Hadoop</a>
-            
-        
-            
-            <a href="/tags/#ETL" title="ETL" rel="2">ETL</a>
-            
-        
-            
-            <a href="/tags/#Hive" title="Hive" rel="1">Hive</a>
             
         
             
@@ -554,7 +682,7 @@ List内部并不是通过==判断两个元素.........
             
         
             
-            <a href="/tags/#Vertica" title="Vertica" rel="1">Vertica</a>
+            <a href="/tags/#Vertica" title="Vertica" rel="2">Vertica</a>
             
         
     </div>
@@ -611,23 +739,23 @@ List内部并不是通过==判断两个元素.........
     <ul>
       
         <li>
+          <a href="/2019/12/22/hive-notes2/">Hive-笔记（3）</a>
+        </li>
+      
+        <li>
+          <a href="/2019/12/22/hive-notes1/">Hive-笔记（2）</a>
+        </li>
+      
+        <li>
           <a href="/2019/11/27/trees/">LSM-tree和B-tree笔记</a>
         </li>
       
         <li>
+          <a href="/2019/11/24/vertica-about-with/">Vertica的with语句问题</a>
+        </li>
+      
+        <li>
           <a href="/2019/11/13/sql1/">关于数据统计中的年累计运算</a>
-        </li>
-      
-        <li>
-          <a href="/2019/11/08/hive-row2col/">Hive分组行转列实现</a>
-        </li>
-      
-        <li>
-          <a href="/2019/11/04/vertica-copy/">Vertica 导入导出CSV文件</a>
-        </li>
-      
-        <li>
-          <a href="/2019/11/03/java-map/">Java map</a>
         </li>
       
     </ul>
@@ -638,7 +766,7 @@ List内部并不是通过==判断两个元素.........
         
     <h5>Achives</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">7</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">8</span></li></ul>
     </div>
 
         <hr>
