@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          Vertica的with语句问题 - null
+          
         
     </title>
 
-    <link rel="canonical" href="https://dragonskyhydra.github.io/2019/11/24/vertica-about-with/">
+    <link rel="canonical" href="https://dragonskyhydra.github.io/page/2/">
 
     <!-- Bootstrap Core CSS -->
 
@@ -101,19 +101,13 @@
 			
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1" style="z-index:2;">
                 
-                    <div class="post-heading" style="padding:40px">
-                        <div class="tags">
-                            
-                              <a class="tag" href="/tags/#Vertica" title="Vertica">Vertica</a>
-                            
-                        </div>
-                        <h1>Vertica的with语句问题</h1>
-                        <h2 class="subheading"></h2>
-                        <span class="meta">
-                            Posted by hydra on
-                            2019-11-24
-                        </span>
+				
+                    <div class="site-heading"  style="padding:40px">
+                        <h1>数据之道</h1>
+                        <!--<hr class="small">-->
+                        <span class="subheading">学习和研究</span>
                     </div>
+                
                 
                 </div>
             </div>
@@ -234,149 +228,227 @@
 
 
     <!-- Main Content -->
-    <!-- Modify by Yu-Hsuan Yen -->
+    <!-- Main Content -->
+<div class="container">
+    <div class="row">
+        
 
-<!-- Post Content -->
-<article>
-    <div class="container">
-        <div class="row">
-
-            <!-- Post Container -->
+<!-- USE SIDEBAR -->
+    <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-2
-                col-md-10 col-md-offset-1
-                post-container">
+                col-lg-8 col-lg-offset-1
+                col-md-8 col-md-offset-1
+                col-sm-12
+                col-xs-12
+                post-container
+            ">
+            
+	        
+                <!-- Main Content -->
 
-                <h2 id="关于Vertica使用CTE表达式所遇到的问题之一"><a href="#关于Vertica使用CTE表达式所遇到的问题之一" class="headerlink" title="关于Vertica使用CTE表达式所遇到的问题之一"></a>关于Vertica使用CTE表达式所遇到的问题之一</h2><p>今天在工作中遇到一个玄学问题，是关于Vertica使用with语句的问题，语句如下：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> a <span class="keyword">as</span> (</span><br><span class="line">    <span class="keyword">select</span> t1.c1, t1.c2,t2.c3 <span class="keyword">from</span> table1 t1</span><br><span class="line">    <span class="keyword">join</span> table2 t2 <span class="keyword">on</span> t1.c3=t2.c3</span><br><span class="line">)</span><br><span class="line">,b <span class="keyword">as</span> (</span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> table3</span><br><span class="line">)</span><br><span class="line">,aa <span class="keyword">as</span> (</span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> a <span class="keyword">where</span> grouprowid=<span class="number">1</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> a <span class="keyword">join</span> b <span class="keyword">on</span> filter1 <span class="keyword">join</span> aa <span class="keyword">on</span> filter2</span><br></pre></td></tr></table></figure>
-<p>单独查询结果集a,b,aa，任何一个都可以秒出结果，但一当join起来，就完全查询不出来。<br>然后当我把a落地为结果表之后，后面无论怎么查询或join都没有问题了<br>最后还发现比较神奇的事，结尾一段select换种写法也没问题</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> a,b,aa <span class="keyword">where</span> filter1 <span class="keyword">and</span> filter2</span><br></pre></td></tr></table></figure>
 
-<p>这种写法替换掉join，也可以秒出。<br>暂时不知道到底是vertica的问题还是DBeaver的问题。</p>
 
-                
 
-                <hr>
-                <!-- Pager -->
-                <ul class="pager">
-                    
-                        <li class="previous">
-                            <a href="/2019/11/27/trees/" data-toggle="tooltip" data-placement="top" title="LSM-tree和B-tree笔记">&larr; Previous post</a>
-                        </li>
-                    
-                    
-                        <li class="next">
-                            <a href="/2019/11/13/sql1/" data-toggle="tooltip" data-placement="top" title="关于数据统计中的年累计运算">Next post &rarr;</a>
-                        </li>
-                    
-                </ul>
+<div class="w3-row-padding">
+	<a href="/2019/11/03/hello-world/">
+        <h2 class="post-title">
+            Hello World
+        </h2>
+        <h3 class="post-subtitle">
+            
+        </h3>
+	</a>
 
-                <br>
+<div>
 
-                <!--打赏-->
-                
-                <!--打赏-->
+    <a href="/2019/11/03/hello-world/">
 
-                <br>
-                <!--分享-->
-                
-                    <div class="social-share"  data-wechat-qrcode-helper="" align="center"></div>
-                    <!--  css & js -->
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/css/share.min.css">
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/social-share.js/1.0.16/js/social-share.min.js"></script>
-                
-                <!--分享-->
-                <br>                       
-                
-                <!-- require APlayer -->
-                
-
-                <!-- disqus comment start -->
-                
-                <!-- disqus comment end -->
-
-                
-				
-            </div>
-
-            <!-- Tabe of Content -->
-            <!-- Table of Contents -->
-
-                
-            <!-- Sidebar Container -->
-            <div class="
-                col-lg-8 col-lg-offset-2
-                col-md-10 col-md-offset-1
-                sidebar-container">
-
-                <!-- Featured Tags -->
-                
-                <section>
-                    <!-- no hr -->
-                    <h5><a href="/tags/">Tags</a></h5>
-                    <div class="tags">
-                       
-                          <a class="tag" href="/tags/#Vertica" title="Vertica">Vertica</a>
-                        
-                    </div>
-                </section>
-                
-
-                <!-- Friends Blog -->
-                
-                <hr>
-                <h5>FRIENDS</h5>
-                <ul class="list-inline">
-
-                    
-                        <li><a href="https://github.com/dragonskyhydra" target="_blank">MyGithub</a></li>
-                    
-                </ul>
-                
-            </div>
+        <div class="post-content-preview">
+            Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub..........
         </div>
+    </a>
+    
+        <p class="post-meta">
+            Posted by hydra on
+            2019-11-03
+        </p>
+    
+
+</div>
+</div>
+<hr>
+
+
+
+<!-- Pager -->
+
+<ul class="pager">
+    
+        <li class="previous">
+            <a href="/">&larr; Newer Posts</a>
+        </li>
+    
+    
+</ul>
+
+
+            
+
+
+
+                <!-- 如果开启评论功能 -->
+                
+            </div>
+
+          <!-- Sidebar Container -->
+<div class="
+    col-lg-3 col-lg-offset-0
+    col-md-3 col-md-offset-0
+    col-sm-12
+    col-xs-12
+    sidebar-container
+">
+    
+        <!-- Featured Tags -->
+
+<section>
+    <!-- no hr -->
+    <h5><a href="/tags/">Tags</a></h5>
+    <div class="tags">
+        
+            
+            <a href="/tags/#Hadoop" title="Hadoop" rel="3">Hadoop</a>
+            
+        
+            
+            <a href="/tags/#ETL" title="ETL" rel="4">ETL</a>
+            
+        
+            
+            <a href="/tags/#Hive" title="Hive" rel="2">Hive</a>
+            
+        
+            
+            <a href="/tags/#Java" title="Java" rel="2">Java</a>
+            
+        
+            
+            <a href="/tags/#RDBMS" title="RDBMS" rel="1">RDBMS</a>
+            
+        
+            
+            <a href="/tags/#NoSQL" title="NoSQL" rel="1">NoSQL</a>
+            
+        
+            
+            <a href="/tags/#Vertica" title="Vertica" rel="2">Vertica</a>
+            
+        
     </div>
-</article>
+</section>
+
+        <hr>
+    
+        <!-- Short About -->
+<section class="visible-md visible-lg">
+    <!--<h5><a href="/about/">About me</a></h5>-->
+    <h5><a href="https://github.com/dragonskyhydra" target="_blank" rel="noopener">About me</a></h5>
+    <div class="short-about">
+
+        
+            <img id = "avatar_pic" src="/img/avatar/timg.jpg" />
+        
+
+        
+            <p>1620189485@qq.com</p>
+        
+
+        <!-- SNS Link -->
+        <ul class="list-inline">
+            
+            
+            
+
+            
+
+            
+
+            
+                <li>
+                    <a target="_blank"  href="https://github.com/dragonskyhydra">
+                        <span class="fa-stack fa-lg">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </a>
+                </li>
+            
+            
+            
+            
+        </ul>
+    </div>
+</section>
+
+        <hr>
+    
+        
+  <h5>Recent posts</h3>
+  <div class="widget">
+    <ul>
+      
+        <li>
+          <a href="/2020/04/07/hadoop-notes1/">hadoop生态笔记（1）</a>
+        </li>
+      
+        <li>
+          <a href="/2019/12/22/hive-notes2/">Hive-笔记（3）</a>
+        </li>
+      
+        <li>
+          <a href="/2019/12/22/hive-notes1/">Hive-笔记（2）</a>
+        </li>
+      
+        <li>
+          <a href="/2019/11/27/trees/">LSM-tree和B-tree笔记</a>
+        </li>
+      
+        <li>
+          <a href="/2019/11/24/vertica-about-with/">Vertica的with语句问题</a>
+        </li>
+      
+    </ul>
+  </div>
+
+        <hr>
+    
+        
+    <h5>Achives</h5>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">8</span></li></ul>
+    </div>
+
+        <hr>
+    
+        <!-- Friends Blog -->
+
+<h5>Friends</h5>
+<ul class="list-inline">
+
+    
+        <li><a href="https://github.com/dragonskyhydra" target="_blank">MyGithub</a></li>
+    
+</ul>
 
 
+        <hr>
+    
+</div>
 
 
-
-
-<!-- async load function -->
-<script>
-    function async(u, c) {
-      var d = document, t = 'script',
-          o = d.createElement(t),
-          s = d.getElementsByTagName(t)[0];
-      o.src = u;
-      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
-      s.parentNode.insertBefore(o, s);
-    }
-</script>
-<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
-<script>
-    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
-        anchors.options = {
-          visible: 'hover',
-          placement: 'left',
-          icon: 'ℬ'
-        };
-        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
-    })
-</script>
-<style>
-    /* place left on bigger screen */
-    @media all and (min-width: 800px) {
-        .anchorjs-link{
-            position: absolute;
-            left: -0.75em;
-            font-size: 1.1em;
-            margin-top : -0.1em;
-        }
-    }
-</style>
-
+        
+    </div>
+</div>
 
 
     <!-- Footer -->
@@ -481,7 +553,7 @@
 <script>
     // only load tagcloud.js in tag.html
     if($('#tag_cloud').length !== 0){
-        async("https://dragonskyhydra.github.io/2019/11/24/vertica-about-with/index.html/js/jquery.tagcloud.js",function(){
+        async("https://dragonskyhydra.github.io/page/2/index.html/js/jquery.tagcloud.js",function(){
             $.fn.tagcloud.defaults = {
                 //size: {start: 1, end: 1, unit: 'em'},
                 color: {start: '#bbbbee', end: '#0085a1'},
