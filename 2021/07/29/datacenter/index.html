@@ -14,11 +14,11 @@
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <title>
         
-          Hadoop生态笔记（1） - null
+          论企业信息化和数字化转型 - null
         
     </title>
 
-    <link rel="canonical" href="https://dragonskyhydra.github.io/2020/04/07/hadoop-notes1/">
+    <link rel="canonical" href="https://dragonskyhydra.github.io/2021/07/29/datacenter/">
 
     <!-- Bootstrap Core CSS -->
 
@@ -105,11 +105,11 @@
                         <div class="tags">
                             
                         </div>
-                        <h1>Hadoop生态笔记（1）</h1>
+                        <h1>论企业信息化和数字化转型</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by hydra on
-                            2020-04-07
+                            2021-07-29
                         </span>
                     </div>
                 
@@ -245,25 +245,28 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h2 id="Hadoop生态，数据存储。"><a href="#Hadoop生态，数据存储。" class="headerlink" title="Hadoop生态，数据存储。"></a>Hadoop生态，数据存储。</h2><h3 id="数据采集，转换（存储容器格式）"><a href="#数据采集，转换（存储容器格式）" class="headerlink" title="数据采集，转换（存储容器格式）"></a>数据采集，转换（存储容器格式）</h3><p>Flume、kafka、sqoop</p>
-<h3 id="文件系统"><a href="#文件系统" class="headerlink" title="文件系统"></a>文件系统</h3><p>HDFS</p>
-<h3 id="数据格式"><a href="#数据格式" class="headerlink" title="数据格式"></a>数据格式</h3><p>1、文本数据CSV</p>
-<p>2、结构化文本数据XML和JSON，这种文件很难分片，Hadoop没有为这类格式提供内置的InputFormat。<br>使用类似Avro的容器格式。将数据转换为Avro的内容，从而为数据存储与数据处理提供更紧密、有效的方法。<br>使用处理XML或JSON文件的专用库。比如，XML，Pig的PiggyBank库中的XMLLoader。JSON，Elephant Bird项目提供的LzoJsonInputFormat。</p>
-<p>3、二进制数据（比如图像）<br>对于Hadoop大多数应用场景来说，二进制文件的存储和处理最好使用SequenceFile之类的容器格式。如果二进制数据的每个分片大于64MB，则可以考虑直接使用该二进制数据自己的格式，无需容器格式。</p>
-<h3 id="文件类型"><a href="#文件类型" class="headerlink" title="文件类型"></a>文件类型</h3><p>为了配合MapReduce应用，Hadoop开发了一些专用文件格式，基于文件的数据结构（如SequenceFile），序列化格式（如Avro），列式存储格式（如RCFile和Parquet）。<br>对于Hadoop应用来说，需求特点：（可分片压缩）和（文件格式自描述、与压缩编码无关）</p>
-<h4 id="SequenceFile"><a href="#SequenceFile" class="headerlink" title="SequenceFile"></a>SequenceFile</h4><p>SequenceFile以二进制键值对的方式存储数据，支持三种记录存储方式：<br>无压缩，IO效率差，占磁盘。优势不大。<br>记录级压缩，对每一条记录压缩。<br>块级压缩，数据达到指定数据块大小再压缩，与记录压缩比，拥有更高的压缩率。（此块与HDFS文件系统数据块无关）通常选块级压缩。<br>SequenceFile包含头部格式，支持分片，通常作为小文件容器格式使用。hadoop小文件问题：大量的小文件导致NameNode过度使用内存，HDFS中每个文件的元数据都会存在内存里。<br>来自小文件的大量数据处理需要很多数据处理子任务，导致资源过度消耗。将小文件打包到SequenceFile能更加有效存储和处理。 </p>
-<h4 id="序列化格式"><a href="#序列化格式" class="headerlink" title="序列化格式"></a>序列化格式</h4><p>序列化，将数据结构转化为字节流的过程，一般用于数据存储或网络传输。反序列化，将字节流转化为数据结构的过程。<br>序列化是分布式处理系统的核心，原因在于能对数据转化，形成一种格式；使用该格式之后，数据可以有效存储，也能通过网络连接进行传输。<br>它通常关联到分布式处理系统的两个方面：进程间通信（如RPC），以及数据存储。</p>
-<p>Hadoop主要采用的序列化格式为Writables。Writables的特点是紧密、快速，但脱离Java语言不容易扩展和使用。<br>Hadoop生态系统中也有普及的其他序列化框架，Thrift，Protocol Buffers ，Avro。</p>
-<p>Thrift<br>Facebook公司开发的框架，用于实现跨语言提供服务接口。IDL定义服务接口，IDL文件创建桩代码。Thrift的RPC层非常健壮，跨平台通信，实现多语言使用的接口。<br>但作为序列化框架而言，存在一些缺陷，不支持记录的内部压缩，不可分片，缺少MapReduce的原生支持，<br>一些外部库（如Elephant Bird项目）能够消除这些缺陷，但Hadoop没有为作为数据存储格式的Thrift提供原生支持。</p>
-<p>Protocol Buffers<br>由Google公司开发，用于在不同语言编写的服务之间完成数据交换。IDL定义服务接口，IDL文件创建桩代码<br>与Thrift类似，不支持记录的内部压缩，不可分片，缺少MapReduce的原生支持。Elephant Bird项目可以用于编码Protobuf记录，支持MapReduce，压缩，及分片。</p>
-<p>Avro<br>一种和语言无关的数据序列化系统。设计初衷是为了解决Hadoop Writables的主要缺点，即缺少跨语言的可移植性支持。<br>Avro将模式存于每个文件的头部，每个文件都是自描述的。容易读取，即使用一种语言写入数据，用另一种语言来读取，也没有影响。<br>可压缩且可分片，为MapReduce提供了更好的原生支持。<br>支持模式演进（schema evolution）,读取文件的模式不需要与写入文件的模式严格匹配，比SequenceFile更适合Hadoop。</p>
-<h4 id="列式存储格式"><a href="#列式存储格式" class="headerlink" title="列式存储格式"></a>列式存储格式</h4><p>RCFile<br>专为高效处理MapReduce应用程序开发。尽管实践中，一般只作为Hive存储格式使用。文件按行进行分片，每个分片按列存储。</p>
-<p>ORC<br>开发初衷弥补RCFile的不足，尤其是查询性能和存储效率方面的缺陷。<br>支持使用zlib、LZO和Snappy压缩算法提供进一步压缩。谓词下推至存储层，仅返回查询需要的数据。支持Hive类型的模型，decimal与复杂类型。支持分片。<br>劣势是它专门为Hive设计的，不是通用的存储格式。无法用于非Hive的MapReduce接口（如Pig或Java），也无法用于Impala。</p>
-<p>Parquet<br>和ORC拥有很多相同的设计目标，但是Parquet有意成为Hadoop上的通用存储格式。文件尾部有完整的元数据信息存储，自描述。<br>完全支持通过Avro和Thrift API写入和读取。</p>
-<p>注意：列格式虽高效，在错误处理方面不是很好，文件损毁可能导致行不完整。</p>
-<h3 id="压缩"><a href="#压缩" class="headerlink" title="压缩"></a>压缩</h3><p>压缩会增加CPU负载，大多数情况下，压缩节省IO比CPU负载增加更重要。<br>Snappy，Google开发的压缩编解码器，比较平衡压缩速度和大小，压缩文件不可分片，要与容器格式（如SequenceFile和Avro）联合使用。<br>LZO，压缩速度不错，压缩率略显平庸。文件可分片。(许可协议不允许打包到Hadoop一起分发，需要单独安装)<br>Gzip，压缩性能非常好，平均能达到Snappy的2.5倍。写入速度不如Snappy，平均为Snappy的一半。读取性能与Snappy差不多。不可分片。<br>bzip2，压缩性能很优越，处理性能较差一点。额外的压缩要在读取，写入性能上付出代价。可分片。</p>
-<p>与容器文件格式（Avro等）一起使用，任何压缩格式都是可分片的。容器文件格式能单独压缩记录构成的数据块，也可进行记录级压缩。</p>
-<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p>《Hadoop应用架构》 人民邮电出版社</p>
+                <h2 id="信息化和数字化"><a href="#信息化和数字化" class="headerlink" title="信息化和数字化"></a>信息化和数字化</h2><h3 id="信息化和数字化的区别"><a href="#信息化和数字化的区别" class="headerlink" title="信息化和数字化的区别"></a>信息化和数字化的区别</h3><p>数据作为企业的一种最重要最具价值的资产，已经受到广大认可。在国家新基建的号召下，数字化转型的口号甚嚣尘上，数据中台就是其中具象化的代表作。</p>
+<p>数据中台是什么？我也看过不少文章，一直想寻求一个唯一解，到现在发现，这个概念还很难说有一个确定的、公共的定义。各家之言，每家都有自己的理解和解释。</p>
+<p>但这些理论之中也有一些相似相通之处。数据中台，它的属性里一定是具有以下几种：可复用的工具集、统一的方法论、将数据从资产到价值贯通，实现数据变现，为业务赋能，甚至直接产生业务价值。</p>
+<p>再做个小小的提炼：数据中台，以数仓为基础架构，面向业务，生产精准的数据服务，最终沉淀出有价值的、可复用、方便获取和应用的数据资产。</p>
+<p>现在有不少浮于表面的数字化转型，实际只是进一步的信息化。</p>
+<p>十多年前，企业为了提高生产效率，建立CRM，ERP等等类似系统，实际上就是方便企业信息流通，实现精益化管理。商业的基础就是信息流通，信息化就是企业搭建信息高速流转架构，改变生产方式，甚至于变更企业思维和执行内核。</p>
+<p>有别于传统企业的口耳相传、低效率的笔写纸记，当现实世界的事件抽象到信息系统里，信息化的企业处理事件的效率和即时反馈的速率都有了极高的提升，</p>
+<p>信息化，有不少企业可以做到，因为信息化主要涉及到还是执行方式和行为模式上的变化，即使可能有一些历史包袱，但由于它在工作效率上的巨大提升是可以预见的，很多企业可以做出取舍，最终完全投入信息化。</p>
+<p>但数字化就并不是那么简单了，数字化和信息化到底有什么区别？不都是借助于IT系统来做成某件事？</p>
+<p>信息化确实是有明确目标，要做出某个信息系统。但数字化转型是完全不一样的。它并不是说要建出了某个数据模型、做了某个标准化的数据治理、做出某个数据仓库、某个数据中台，或者某个数据湖就是数字化转型了。</p>
+<p>数字化转型不是某件事，是一个持续的、改变企业思维内核、改变企业运作模型的变革，就像从工业革命一样，从电气化跨入信息化，从信息化跨越到数字化，远远不止仅仅做成某件事、做出某个系统。它是重塑生产组织方式和创新机制，是企业的发展方向。</p>
+<p>借助数据资产来实现业务创新是一个全新的、有别于之前的商业模型。最典型的数字化企业就是如字节跳动，最典型的数字化业务就是智能推荐系统。虽然它有如信息茧房的诟病，但不可否认这种方式在商业上的成功。这是互联网企业的数据应用，传统企业应该如何实现自己的数据资产价值化？</p>
+<p>BI是之前数据仓库建立之后的一个主要用途，报表、数据可视化、领导驾驶舱等等数据应用，不能说数据没转换成价值，但是太间接了，价值更多体现在具体的应用方自身能力上。</p>
+<p>这和大数据时代的数据资产价值化并不是一回事。大数据有四大属性，数据量大，产生速度快，变化多，以及价值密度低。</p>
+<p>大数据的资产价值，需要企业全域数据贯通，从贯通后海量的数据里提炼价值，它能更改整个企业的生产方式，直接产生效益，不需要依靠具体的人或能力。它是直接的生产力。</p>
+<p>数字化转型和之前的BI应用最大区别就是，核心主体在资产化的数据本身，一切以数据资产为核心展开生产活动，而以前的BI，更多的只是数据展示途径，价值间接体现在人的决策上，核心主体还是具体的人，数据只是决策的方面参考。</p>
+<h3 id="如何实现企业的数字化转型？"><a href="#如何实现企业的数字化转型？" class="headerlink" title="如何实现企业的数字化转型？"></a>如何实现企业的数字化转型？</h3><p>数据中台和数据湖或许是两个具体实施的方向。</p>
+<p>数据中台是建立一个中心化的数据服务体系，希望能够自底向上构建一个基于数据资产的基础架构。</p>
+<p>数据湖是企业全域数据的统一存储服务，对数据的深度应用需要数据科学家的自定义挖掘。</p>
+<p>这两者就如之前SQL和NoSQL的分别一样，一个先对数据进行预定义的模式，收入的数据必定都是规范化、标准化的，类似于数据库的写时模式。</p>
+<p>一个类似于保持源内容，只是对存储进行统一和标准组织，从里面取出数据再定义模式就看各应用方，类似于NoSQL的读时模式。</p>
+<p>数据库写模式和读模式，这里不多做介绍。不了解的读者推荐读一读《数据密集型应用系统涉及》第一章。</p>
 
                 
 
@@ -271,13 +274,9 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/2021/07/29/datacenter/" data-toggle="tooltip" data-placement="top" title="论企业信息化和数字化转型">&larr; Previous post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/2019/12/22/hive-notes2/" data-toggle="tooltip" data-placement="top" title="Hive-笔记（3）">Next post &rarr;</a>
+                            <a href="/2020/04/07/hadoop-notes1/" data-toggle="tooltip" data-placement="top" title="Hadoop生态笔记（1）">Next post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -490,7 +489,7 @@
 <script>
     // only load tagcloud.js in tag.html
     if($('#tag_cloud').length !== 0){
-        async("https://dragonskyhydra.github.io/2020/04/07/hadoop-notes1/index.html/js/jquery.tagcloud.js",function(){
+        async("https://dragonskyhydra.github.io/2021/07/29/datacenter/index.html/js/jquery.tagcloud.js",function(){
             $.fn.tagcloud.defaults = {
                 //size: {start: 1, end: 1, unit: 'em'},
                 color: {start: '#bbbbee', end: '#0085a1'},
